@@ -1,1 +1,1 @@
-export HEROKU=1
+export HEROKU=0
