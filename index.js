@@ -18,21 +18,19 @@ app.get('/', function (req, res) {
 
 // for Facebook verification
 app.get('/webhook/', function (req, res) {
-  if (req.query['hub.verify_token'] === 'chat-bot-2') {
+  if (req.query['hub.verify_token'] === 'chat-bot') {
     res.send(req.query['hub.challenge'])
   }
   res.send('Error, wrong token')
 })
 
 app.post('/webhook/', function (req, res) {
-  console.log('larala');
   messaging_events = req.body.entry[0].messaging
   for (i = 0; i < messaging_events.length; i++) {
     event = req.body.entry[0].messaging[i]
     sender = event.sender.id
     if (event.message && event.message.text) {
-      const text = event.message.text;
-      console.log(text);
+      text = event.message.text
       if (text === 'Generic') {
         sendGenericMessage(sender)
         continue
@@ -48,7 +46,7 @@ app.post('/webhook/', function (req, res) {
   res.sendStatus(200)
 })
 
-var token = "EAANEkVBK2c8BAGUaKLZCaGAiqm7SI8PvXuVSZBr56JAxH6dZBhZCQvKMhqZB7z6pvCK3wtirHUkDvLnlzMSEr4IvrX7E8a2hwTcshgzI8Ag3GfVs8GNGUw1dxhOkZAUkBUhhDgvX7NAuPuJ5HjJTZBFpbaUk6gIPfx1ZAWkMBXU6gQZDZD";
+var token = "EAANEkVBK2c8BALFE8ey7AcDXZC2cVP2y1ZA2tpXHlJYwF7sbP2rg6iZBY7gPKgnQF4NZCkZCDIbvvMUWWRwTNOaH3i7bmy5uiqix5s0UNHwge1kC4N6PGUZA78ONRizsBtxOpzlvNhZAkwwCBljpZBNuP6exfowilw3Jx9CsJtDBIAZDZD";
 
 function sendTextMessage(sender, text) {
   messageData = {
@@ -78,12 +76,12 @@ function sendGenericMessage(sender) {
       "payload": {
         "template_type": "generic",
         "elements": [{
-          "title": "Madrid",
-          "subtitle": "Madrid a 1780",
-          "image_url": "https://d1boyphjpqts2r.cloudfront.net/img/resourcestc/MAD.jpg",
+          "title": "First card",
+          "subtitle": "Element #1 of an hscroll",
+          "image_url": "http://messengerdemo.parseapp.com/img/rift.png",
           "buttons": [{
             "type": "web_url",
-            "url": "https://www.turismocity.com.ar/vuelos-baratos-a-MAD-Madrid?from=BUE",
+            "url": "https://www.messenger.com",
             "title": "web url"
           }, {
             "type": "postback",
