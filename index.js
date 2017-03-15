@@ -38,7 +38,7 @@ app.post('/webhook/', function (req, res) {
       if (event.postback) {
         if (event.postback.payload) {
           switch (event.postback.payload) {
-            case 'USER_DEFINED_PAYLOAD' : default:
+            case 'USER_DEFINED_PAYLOAD': 'RESTART' : default:
               sendFirstButtons(sender);
               break;
           }
