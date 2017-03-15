@@ -27,26 +27,52 @@ app.get('/webhook/', function (req, res) {
 app.post('/webhook/', function (req, res) {
   messaging_events = req.body.entry[0].messaging
   for (i = 0; i < messaging_events.length; i++) {
-    event = req.body.entry[0].messaging[i]
-    sender = event.sender.id
-    if (event.message && event.message.text) {
-      text = event.message.text
-      if (text === 'Generic') {
-        sendGenericMessage(sender)
-        continue
+    event = req.body.entry[0].messaging[i];
+    getUserFullname(event).then((result) => {
+      sender = event.sender.id
+      if (event.message && event.message.text) {
+        text = event.message.text;
+
+        sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
       }
-      sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200))
-    }
-    if (event.postback) {
-      text = JSON.stringify(event.postback)
-      sendTextMessage(sender, "Postback received: "+text.substring(0, 200), token)
-      continue
-    }
+      if (event.postback) {
+        if (event.postback.payload) {
+          switch (event.postback.payload) {
+            case 'USER_DEFINED_PAYLOAD' : default:
+              sendFirstButtons(sender);
+              break;
+          }
+        }
+        const text = JSON.stringify(event.postback);
+        sendTextMessage(sender, "Postback received: "+text.substring(0, 200), token)
+      }
+    });
   }
   res.sendStatus(200)
 })
 
 var token = "EAANEkVBK2c8BALFE8ey7AcDXZC2cVP2y1ZA2tpXHlJYwF7sbP2rg6iZBY7gPKgnQF4NZCkZCDIbvvMUWWRwTNOaH3i7bmy5uiqix5s0UNHwge1kC4N6PGUZA78ONRizsBtxOpzlvNhZAkwwCBljpZBNuP6exfowilw3Jx9CsJtDBIAZDZD";
+
+function getUserFullname(event) {
+  return new Promise((resolve, reject) => {
+    if (event.message && !event.message.is_echo) {
+      request({
+        url: `https://graph.facebook.com/v2.6/${event.sender.id}`,
+        qs: {
+          access_token: token,
+          fields: 'first_name,last_name'
+        }
+      }, function(error, response, body) {
+        if (error) {
+          return reject(error);
+        }
+        console.log(response.body);
+        return resolve(response.body);
+      });
+    }
+    return resolve({});
+  });
+}
 
 function sendTextMessage(sender, text) {
   messageData = {
@@ -63,8 +89,38 @@ function sendTextMessage(sender, text) {
   }, function(error, response, body) {
     if (error) {
       console.log('Error sending messages: ', error)
-    } else if (response.body.error) {
-      console.log('Error: ', response.body.error)
+    }
+  })
+}
+
+function sendFirstButtons(sender) {
+  messageData = {
+    text: "Que queres hacer?",
+    quick_replies: [
+      {
+        content_type: "text",
+        title: "Buscar vuelo",
+        payload: "BUSCAR_VUELO",
+      },
+      {
+        content_type: "text",
+        title: "Obtener vuelos baratos",
+        payload: "BUSCAR_VUELO_BARATO",
+      },
+    ],
+  };
+
+  request({
+    url: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: {access_token:token},
+    method: 'POST',
+    json: {
+      recipient: {id:sender},
+      message: messageData,
+    }
+  }, function(error, response, body) {
+    if (error) {
+      console.log('Error sending messages: ', error)
     }
   })
 }
@@ -112,8 +168,6 @@ function sendGenericMessage(sender) {
   }, function(error, response, body) {
     if (error) {
       console.log('Error sending messages: ', error)
-    } else if (response.body.error) {
-      console.log('Error: ', response.body.error)
     }
   })
 }
