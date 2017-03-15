@@ -78,10 +78,10 @@ function sendGenericMessage(sender) {
         "elements": [{
           "title": "First card",
           "subtitle": "Element #1 of an hscroll",
-          "image_url": "http://messengerdemo.parseapp.com/img/rift.png",
+          "image_url": "https://d1boyphjpqts2r.cloudfront.net/img/resourcestc/MAD.jpg",
           "buttons": [{
             "type": "web_url",
-            "url": "https://www.messenger.com",
+            "url": "https://www.turismocity.com.ar/vuelos-baratos-a-MAD-Madrid?from=BUE",
             "title": "web url"
           }, {
             "type": "postback",
